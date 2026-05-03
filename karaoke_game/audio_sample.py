@@ -1,6 +1,7 @@
 import sounddevice as sd
 import numpy as np
 import pyqtgraph as pg
+from scipy import signal
 
 
 # Set up audio stream
@@ -41,6 +42,31 @@ def audio_callback(indata, frames, time, status):
         print(status)
 
     data = indata[:, 0]  # mono
+    
+
+    data *= np.hamming(len(data))
+        
+    KERNEL_SIZE = 5
+    KERNEL_SIGMA = 10
+    kernel = signal.windows.gaussian(KERNEL_SIZE, KERNEL_SIGMA) # create a kernel
+    kernel /= np.sum(kernel)
+        
+    data2 =  np.convolve(data, kernel, 'same')
+        
+    fft = np.fft.fft(data2)
+    frequencyStrength = np.abs(fft)
+
+    freqs = np.fft.fftfreq(len(data2), 1 / RATE)
+
+        
+    positive = freqs > 0
+    freqs = freqs[positive]
+    frequencyStrength = frequencyStrength[positive]
+
+    dominant_freq = freqs[np.argmax(frequencyStrength)]
+    
+    midi = 69 + 12 * np.log2(dominant_freq / 440.0)
+    print(midi)
     curve.setData(data)
 
 
