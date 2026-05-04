@@ -1,12 +1,11 @@
 import pyglet, WindowHandling, sys
 import sounddevice as sd
-import numpy as np
 from ObjectCreator import ObjectCreator
 from MidiPlayer import MidiPlayer
 from SoundInput import SoundInput
 from pyglet import window
 
-# from pyglet import window.mouse
+
 
 if len(sys.argv) < 2:
     print("Please specify a path: python main.py /path/to/midi_file.mid")
@@ -146,18 +145,6 @@ def update(dt):
             player.stop()
             win.close()
             sys.exit()
-
-
-def freq_to_karaoke_midi(self, prev_midi=None):
-    # method from ChatGpt
-    freq = self.dominant_freq
-    if freq is None:
-        return
-    if freq <= 0:
-        return None
-    midi = 69 + 12 * np.log2(freq / 440.0)
-    midi = int(round(midi))
-    return midi
 
 
 pyglet.clock.schedule_interval(update, 0.01)  # 100 per sec
