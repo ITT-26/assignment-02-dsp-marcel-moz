@@ -3,7 +3,7 @@
 # Task 1 - Karaoke Game
 -  How to Start:
   - run [main.py](./karaoke_game/main.py)
-    - python main.py /path/to/midi_file.mid e.g. python .\main.py ..\read_midi\berge.mid
+    - you can use: python main.py /path/to/midi_file.mid e.g. python .\main.py ..\read_midi\berge.mid
   - choose one of the suggested audio input devices on your console by pressing the corresponding number
   - the game window opens and the selected song plays
   - sing along and compare your melody
