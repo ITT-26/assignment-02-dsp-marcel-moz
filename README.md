@@ -2,8 +2,25 @@
 
 # Task 1 - Karaoke Game
 -  How to Start:
-  - run [main.py](./karaoke_game/main.py)
-    - you can use: python main.py /path/to/midi_file.mid e.g. python .\main.py ..\read_midi\berge.mid
+  - run [./karaoke_game/main.py](./karaoke_game/main.py)
+    - you can use: python .\karaoke_game\main.py \path\to\midi_file.mid
+    - e.g. python .\karaoke_game\main.py .\read_midi\freude.mid
   - choose one of the suggested audio input devices on your console by pressing the corresponding number
   - the game window opens and the selected song plays
   - sing along and compare your melody
+
+# Task 2 - Whistle Input
+## a) 2D Application
+- How to Start:
+  - run [./whistle_input/whistle_input.py](./whistle_input/whistle_input.py)
+    - so: python .\whistle_input\whistle_input.py
+  - choose one of the suggested audio input devices on your console by pressing the corresponding number
+  - use "upward chirp" and "downword chirp" to select a different rectangle
+
+## b) Trigger Key Presses
+- How to Start:
+  - run [./whistle_input/whistle_keyevents.py](./whistle_input/whistle_keyevents.py)
+    - so: python .\whistle_input\whistle_keyevents.py
+  - choose one of the suggested audio input devices on your console by pressing the corresponding number
+  - switch to a programm of your choice
+  - use "upward chirp" and "downword chirp" to trigger short presses of key up or key down
