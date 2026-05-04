@@ -6,7 +6,7 @@ from scipy import signal
 class SoundInput:
 
     def __init__(self, input_device):
-        self.CHUNK_SIZE = 512  # Number of audio frames per buffer
+        self.CHUNK_SIZE = 8192  # Number of audio frames per buffer 0.186 seconds 
         self.RATE = 44100  # Audio sampling rate (HZ)
         self.CHANNELS = 1  # Mono audio
         self.dominant_freq = None
@@ -40,32 +40,40 @@ class SoundInput:
             print(status)
 
         data = indata[:, 0]  # mono
-        data *= np.hamming(len(data)) # code from jupyter notebook dsp
         
-        KERNEL_SIZE = 5
-        KERNEL_SIGMA = 10
-        kernel = signal.windows.gaussian(KERNEL_SIZE, KERNEL_SIGMA) # create a kernel
-        kernel /= np.sum(kernel)
+        data *= np.hamming(len(data)) # hamming and convultion based on code from jupyter notebook dsp
         
-        data2 =  np.convolve(data, kernel, 'same')
+        kernel = signal.windows.gaussian(9, 5) # create a kernel; 
+        kernel /= np.sum(kernel) # normalize the kernel so it does not affect the signal's amplitude
+           
+        data = np.convolve(data, kernel, 'same') # apply the kernel to the signal
+    
         
-        fft = np.fft.fft(data2)
-        frequencyStrength = np.abs(fft)
+        fft = np.fft.rfft(data)
+        
+        magnitudes = np.abs(fft)
+        freqs = np.fft.rfftfreq(len(data), 1 / self.RATE)
 
-        freqs = np.fft.fftfreq(len(data2), 1 / self.RATE)
+        valid = (freqs >= 80) & (freqs <= 1000) # human voice freq from chat gpt
+        
+        magnitudes = magnitudes[valid]
 
-        # only positive frequencies
-        positive = freqs > 0
-        freqs = freqs[positive]
-        frequencyStrength = frequencyStrength[positive]
+        freqs = freqs[valid]
+    
 
-        # dominant frequency
-        dominant_freq = freqs[np.argmax(frequencyStrength)]
+        if len(magnitudes) == 0:
+            return
+
+
+        
+        idx = np.argmax(magnitudes)
+        
+        dominant_freq = freqs[idx]
         self.dominant_freq = dominant_freq
         self.amplitude = np.sqrt(np.mean(data ** 2)) ##amplitude calc from ChatGPT
         self.dbfs = 20 * np.log10(self.amplitude + 1e-10)  # db conversion from ChatGPT
 
-    def freq_to_karaoke_midi(self, prev_midi=None): # method from ChatGpt
+    def freq_to_karaoke_midi(self): # method from ChatGpt
         freq = self.dominant_freq
         if freq is None:
             return
@@ -75,14 +83,5 @@ class SoundInput:
         midi = 69 + 12 * np.log2(freq / 440.0)
         midi = int(round(midi))
 
-        # octave correction range for voice
-        while midi < 45:
-            midi += 12
-        while midi > 75:
-            midi -= 12
-
-        # smoothing (prevents jumping)
-        if prev_midi is not None and abs(midi - prev_midi) > 5:
-            return prev_midi
 
         return midi

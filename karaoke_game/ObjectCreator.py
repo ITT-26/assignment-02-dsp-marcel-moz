@@ -8,7 +8,38 @@ class ObjectCreator:
         self.batch = batch
         self.y_sec = self.window.height // 10
         self.x_sec = self.window.width // 12
-
+        
+    def createSingNoteLabel(self,group):
+        text = pyglet.text.Label(
+            'You sang',
+            font_name='Arial',
+            font_size=36,
+            x=20,
+            y=20,
+            anchor_x='left',
+            anchor_y='bottom',
+            batch=self.batch,
+            group=group,
+            color=(0, 255, 0),
+        ) 
+        return text
+        
+    def createPlayingSongLabel(self,group):
+        text = pyglet.text.Label(
+            'Playing Song',
+            font_name='Arial',
+            font_size=36,
+            x=20,
+            y=self.y_sec + 20,
+            anchor_x='left',
+            anchor_y='bottom',
+            batch=self.batch,
+            group=group,
+            color=(0, 255, 255),
+        ) 
+     
+        return text
+        
     def createLines(self, group):
         lines = []
         line_h = pyglet.shapes.Line(
@@ -36,30 +67,15 @@ class ObjectCreator:
         lines.append(line_v)
 
         return lines
-
-    def createPitchRectangle(self, group):
-        rect = pyglet.shapes.Rectangle(
-            x=self.window.width // 2,
-            y=self.window.height // 2,
-            width=self.x_sec * 0.25,
-            height=self.y_sec * 0.5,
-            color=(0, 255, 0),
-            batch=self.batch,
-            group=group,
-        )
-        rect.x -= rect.width//2
-        rect.y -= rect.height//2 # center the thing like anchor in middle
-        return rect
     
-    def setObjectYFromNoteHelper(self, object, note):
-            # 55 lowest note and 67 highest
-            min_note = 52  # little bit extra for other files
-            max_note = 70
-            normalized = (note - min_note) / (max_note - min_note)
-            bottom_line = 2 * self.y_sec
-            total_space = 6 * self.y_sec
-            object.y = bottom_line + total_space * normalized
-            
+    def spawn_live_note(self, note, time, group): #function based on chat gpt output
+        newNote = self.NoteRect(batch=self.batch, group=group, creator=self)
+        newNote.setX1FromStartTime(time)
+        newNote.setNote(note)
+        newNote.setWidthFromEndTime(time+0.01) # just set dt from update in main
+        newNote.color = (0,255,0) 
+        return newNote.create()
+
     def createNoteRectangles(
         self, midiMessages, group
     ):  # this method was fixed using Lumo AI assistant
@@ -83,6 +99,7 @@ class ObjectCreator:
                 newNoteRect = self.NoteRect(batch=self.batch, group=group, creator=self)
                 newNoteRect.setX1FromStartTime(current_time)
                 newNoteRect.setNote(msg.note)
+               
 
                 # 2. Store it in the dictionary so we can find it later
                 # If the same note is played again while still holding, this overwrites.
@@ -112,7 +129,7 @@ class ObjectCreator:
             self.startTime = None
             self.duration = None
             self.y = None
-            self.color = (255, 0, 0)
+            self.color = (0, 255, 255)
             self.note = None
             self.batch = batch
             self.group = group
@@ -134,7 +151,15 @@ class ObjectCreator:
             self.setYFromNote(note)
 
         def setYFromNote(self, note):
-            self.creator.setObjectYFromNoteHelper(self,note)
+            min_note = 45  # min and max note of human voice (from chatG)
+            max_note = 80
+            normalized = (note - min_note) / (max_note - min_note)
+            
+            bottom_line = 2 * self.creator.y_sec
+            total_space = 8 * self.creator.y_sec
+            self.y = bottom_line + total_space * normalized
+        
+
 
         def create(self):
             w = max(1, self.width)

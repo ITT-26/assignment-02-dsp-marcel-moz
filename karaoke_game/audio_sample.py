@@ -31,7 +31,14 @@ win = pg.GraphicsLayoutWidget(title="Live Audio")
 plot = win.addPlot()
 plot.setYRange(-1, 1)
 
+plot2 = win.addPlot()
+plot2.setYRange(-1, 1)
+
 curve = plot.plot(pen='w')
+curve2 = plot2.plot(pen='r')
+plot2.setLabel('bottom', 'Frequency', 'Hz')
+plot2.setLabel('left', 'Amplitude')
+
 
 win.show()
 
@@ -43,20 +50,24 @@ def audio_callback(indata, frames, time, status):
 
     data = indata[:, 0]  # mono
     
+    
+    filter_order = 4 #values suggested by chatGPT
+    filter_cutoff = 80
+    band_size = 920
+    
+    bandpass_filter = signal.butter(filter_order, (filter_cutoff, filter_cutoff + band_size), btype='bandpass', analog=False, output='sos', fs=RATE)
+    data = signal.sosfilt(bandpass_filter, data)
 
-    data *= np.hamming(len(data))
+
         
-    KERNEL_SIZE = 5
-    KERNEL_SIGMA = 10
-    kernel = signal.windows.gaussian(KERNEL_SIZE, KERNEL_SIGMA) # create a kernel
-    kernel /= np.sum(kernel)
+    data = signal.medfilt(data, kernel_size=3) #median filter for reducing noise but keeping peaks better
+    
+    data *= np.hamming(len(data))  
         
-    data2 =  np.convolve(data, kernel, 'same')
-        
-    fft = np.fft.fft(data2)
+    fft = np.fft.fft(data)
     frequencyStrength = np.abs(fft)
 
-    freqs = np.fft.fftfreq(len(data2), 1 / RATE)
+    freqs = np.fft.fftfreq(len(data), 1 / RATE)
 
         
     positive = freqs > 0
@@ -64,11 +75,13 @@ def audio_callback(indata, frames, time, status):
     frequencyStrength = frequencyStrength[positive]
 
     dominant_freq = freqs[np.argmax(frequencyStrength)]
+
     
     midi = 69 + 12 * np.log2(dominant_freq / 440.0)
-    print(midi)
+    amplitude = np.sqrt(np.mean(data**2))  ##amplitude calc from ChatGPT
     curve.setData(data)
-
+    curve2.setData(freqs,frequencyStrength)
+  
 
 # open audio input stream
 stream = sd.InputStream(
