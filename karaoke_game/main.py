@@ -96,7 +96,7 @@ def on_key_press(symbol, modifiers):
         soundInput.stop()
         player.stop()
         win.close()
-        sys.exit()
+        pyglet.app.exit()
     
     if symbol == pyglet.window.key.SPACE and not gameStarted:
         gameStarted = True

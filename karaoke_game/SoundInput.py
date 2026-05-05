@@ -43,7 +43,7 @@ class SoundInput:
         
         data *= np.hamming(len(data)) # hamming and convultion based on code from jupyter notebook dsp
         
-        kernel = signal.windows.gaussian(9, 9) # create a kernel; 
+        kernel = signal.windows.gaussian(9, 12) # create a kernel; 
         kernel /= np.sum(kernel) # normalize the kernel so it does not affect the signal's amplitude
            
         data = np.convolve(data, kernel, 'same') # apply the kernel to the signal
