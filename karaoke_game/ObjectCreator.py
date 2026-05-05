@@ -8,6 +8,21 @@ class ObjectCreator:
         self.batch = batch
         self.y_sec = self.window.height // 10
         self.x_sec = self.window.width // 12
+    
+    def createControlLabel(self,group):
+        text = pyglet.text.Label(
+            'ESC = Close, SPACE = Start Game',
+            font_name='Arial',
+            font_size=36,
+            x=20,
+            y=20,
+            anchor_x='left',
+            anchor_y='bottom',
+            batch=self.batch,
+            group=group,
+            color=(255, 255, 255),
+        ) 
+        return text
         
     def createSingNoteLabel(self,group):
         text = pyglet.text.Label(
@@ -15,7 +30,7 @@ class ObjectCreator:
             font_name='Arial',
             font_size=36,
             x=20,
-            y=20,
+            y=self.y_sec + 20,
             anchor_x='left',
             anchor_y='bottom',
             batch=self.batch,
@@ -30,7 +45,7 @@ class ObjectCreator:
             font_name='Arial',
             font_size=36,
             x=20,
-            y=self.y_sec + 20,
+            y=self.y_sec * 2 + 20,
             anchor_x='left',
             anchor_y='bottom',
             batch=self.batch,

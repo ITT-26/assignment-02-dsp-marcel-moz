@@ -4,8 +4,7 @@ from ObjectCreator import ObjectCreator
 from MidiPlayer import MidiPlayer
 from SoundInput import SoundInput
 from pyglet import window
-
-
+from pyglet.window import key
 
 if len(sys.argv) < 2:
     print("Please specify a path: python main.py /path/to/midi_file.mid")
@@ -75,6 +74,9 @@ def buildTimedMessages(
     return timedMsg
 
 
+
+
+
 gameStarted = False
 gameEnded = False
 notes = []
@@ -84,20 +86,34 @@ audioTime = 0
 t = 0
 last_midi = None
 
+@win.event
+def on_key_press(symbol, modifiers):
+    global gameStarted
+    
+    if symbol == pyglet.window.key.ESCAPE:
+        soundInput.stop()
+        player.stop()
+        win.close()
+        sys.exit()
+    
+    if symbol == pyglet.window.key.SPACE and not gameStarted:
+        gameStarted = True
+        soundInput.start()
+
 
 notes = setupTrack(path=path)
 timedMessages = buildTimedMessages(player.messages)
 labelPlayingSong = objectCreator.createPlayingSongLabel(foreground)
 labelYouSang = objectCreator.createSingNoteLabel(foreground)
+controlLabel = objectCreator.createControlLabel(foreground)
+
 
 def update(dt):
     global msg_index, timedMessages, audioTime, gameStarted, notes, t, gameEnded, last_midi
     t += dt
 
     if not gameStarted:
-        gameStarted = True
-
-        soundInput.start()
+        return
 
     if gameStarted and not gameEnded:
         audioTime += dt  # ------ code based on generated code from chatGPT
@@ -119,10 +135,10 @@ def update(dt):
             soundInput.freq_to_karaoke_midi()
         )  # midi note converison from ChatGPT
 
-        #print("sung note: {}".format(midi_note))
-        #print("freq:", soundInput.dominant_freq)
-        #print("amp:", soundInput.amplitude)
-        #print("dbfs:", soundInput.dbfs)
+        # print("sung note: {}".format(midi_note))
+        # print("freq:", soundInput.dominant_freq)
+        # print("amp:", soundInput.amplitude)
+        # print("dbfs:", soundInput.dbfs)
 
         if soundInput.dbfs < -42.5:
             midi_note = None
@@ -130,7 +146,7 @@ def update(dt):
         if midi_note is not None:
 
             note = objectCreator.spawn_live_note(
-                note=midi_note, time=0, group=foreground # spawn at 0 point center line
+                note=midi_note, time=0, group=foreground  # spawn at 0 point center line
             )
             sung_note_rects.append(note)
 
@@ -141,11 +157,7 @@ def update(dt):
 
         if msg_index >= len(timedMessages):
             gameEnded = True
-            soundInput.stop()
-            player.stop()
-            win.close()
-            sys.exit()
-
+            
 
 pyglet.clock.schedule_interval(update, 0.01)  # 100 per sec
 pyglet.app.run()
