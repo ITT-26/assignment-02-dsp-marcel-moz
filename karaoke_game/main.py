@@ -89,6 +89,7 @@ last_midi = None
 @win.event
 def on_key_press(symbol, modifiers):
     global gameStarted
+    global controlLabel
     
     if symbol == pyglet.window.key.ESCAPE:
         soundInput.stop()
@@ -99,6 +100,7 @@ def on_key_press(symbol, modifiers):
     if symbol == pyglet.window.key.SPACE and not gameStarted:
         gameStarted = True
         soundInput.start()
+        controlLabel.x = -5000
 
 
 notes = setupTrack(path=path)
@@ -109,7 +111,7 @@ controlLabel = objectCreator.createControlLabel(foreground)
 
 
 def update(dt):
-    global msg_index, timedMessages, audioTime, gameStarted, notes, t, gameEnded, last_midi
+    global msg_index, timedMessages, audioTime, gameStarted, notes, t, gameEnded, last_midi, controlLabel
     t += dt
 
     if not gameStarted:
@@ -157,6 +159,9 @@ def update(dt):
 
         if msg_index >= len(timedMessages):
             gameEnded = True
+            controlLabel.text = 'Game Over Press ESC to exit the game'
+            controlLabel.x = win.width//2
+            
             
 
 pyglet.clock.schedule_interval(update, 0.01)  # 100 per sec

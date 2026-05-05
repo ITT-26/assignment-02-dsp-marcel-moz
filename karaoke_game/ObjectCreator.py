@@ -11,16 +11,18 @@ class ObjectCreator:
     
     def createControlLabel(self,group):
         text = pyglet.text.Label(
-            'ESC = Close, SPACE = Start Game',
+            'Press SPACE to start the game',
             font_name='Arial',
-            font_size=36,
-            x=20,
-            y=20,
-            anchor_x='left',
-            anchor_y='bottom',
+            font_size=60,
+            x=self.window.width//2,
+            y=self.window.height//2,
+            anchor_x='center',
+            anchor_y='center',
             batch=self.batch,
             group=group,
             color=(255, 255, 255),
+            align='center'
+            
         ) 
         return text
         
@@ -30,7 +32,7 @@ class ObjectCreator:
             font_name='Arial',
             font_size=36,
             x=20,
-            y=self.y_sec + 20,
+            y=20,
             anchor_x='left',
             anchor_y='bottom',
             batch=self.batch,
@@ -45,7 +47,7 @@ class ObjectCreator:
             font_name='Arial',
             font_size=36,
             x=20,
-            y=self.y_sec * 2 + 20,
+            y=self.y_sec + 20,
             anchor_x='left',
             anchor_y='bottom',
             batch=self.batch,
