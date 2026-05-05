@@ -7,7 +7,7 @@
     - e.g. python .\karaoke_game\main.py .\read_midi\freude.mid
   - choose one of the suggested audio input devices on your console by pressing the corresponding number
   - the game window opens 
-  - press SPACE to starte and play the selected song
+  - press SPACE to start and play the selected song
   - sing along and compare your melody
 
 # Task 2 - Whistle Input
