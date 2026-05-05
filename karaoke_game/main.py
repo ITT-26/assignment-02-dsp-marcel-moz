@@ -124,7 +124,7 @@ def update(dt):
         #print("amp:", soundInput.amplitude)
         #print("dbfs:", soundInput.dbfs)
 
-        if soundInput.dbfs < -40:
+        if soundInput.dbfs < -42.5:
             midi_note = None
 
         if midi_note is not None:
