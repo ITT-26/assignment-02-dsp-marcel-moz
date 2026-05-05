@@ -10,18 +10,21 @@ class ObjectCreator:
         self.x_sec = self.window.width // 12
     
     def createControlLabel(self,group):
+       
         text = pyglet.text.Label(
             'Press SPACE to start the game',
             font_name='Arial',
             font_size=60,
-            x=self.window.width//2,
+            x=self.window.width//4,
             y=self.window.height//2,
+            multiline=True,
             anchor_x='center',
             anchor_y='center',
             batch=self.batch,
             group=group,
-            color=(255, 255, 255),
-            align='center'
+            color=(200, 100, 200),
+            align='center',
+            width=self.window.width//3
             
         ) 
         return text

@@ -5,6 +5,7 @@ from MidiPlayer import MidiPlayer
 from SoundInput import SoundInput
 from pyglet import window
 from pyglet.window import key
+import time
 
 if len(sys.argv) < 2:
     print("Please specify a path: python main.py /path/to/midi_file.mid")
@@ -142,7 +143,7 @@ def update(dt):
         # print("amp:", soundInput.amplitude)
         # print("dbfs:", soundInput.dbfs)
 
-        if soundInput.dbfs < -42.5:
+        if soundInput.dbfs < - 45:
             midi_note = None
 
         if midi_note is not None:
@@ -159,8 +160,9 @@ def update(dt):
 
         if msg_index >= len(timedMessages):
             gameEnded = True
-            controlLabel.text = 'Game Over Press ESC to exit the game'
-            controlLabel.x = win.width//2
+            time.sleep(1)
+            controlLabel.text = 'The song is over\nPress ESC to exit the game'
+            controlLabel.x = win.width//4 * 3
             
             
 

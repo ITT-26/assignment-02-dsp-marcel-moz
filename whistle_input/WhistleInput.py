@@ -75,7 +75,7 @@ class WhistleInput:
         self.amplitude = np.sqrt(np.mean(data**2))  ##amplitude calc from ChatGPT
         self.dbfs = 20 * np.log10(self.amplitude + 1e-10)  # db conversion from ChatGPT
 
-        if self.dbfs < -35:
+        if self.dbfs < -40:
             self.last15Chunks.append(None)
         elif self.dominant_freq is not None and self.dominant_freq < 950:
             # if less then 950 no whistle but speech input or something else
