@@ -1,6 +1,6 @@
 import pyglet
 import sounddevice as sd
-from WhistleInput import WhistleInput
+from SoundInput import WhistleInput
 from pyglet import window
 
 

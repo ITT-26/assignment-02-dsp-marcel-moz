@@ -1,5 +1,5 @@
 import sounddevice as sd
-from WhistleInput import WhistleInput
+from SoundInput import WhistleInput
 from pynput.keyboard import Controller, Key
 import time
 
