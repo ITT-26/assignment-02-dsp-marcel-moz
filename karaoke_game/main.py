@@ -75,9 +75,6 @@ def buildTimedMessages(
     return timedMsg
 
 
-
-
-
 gameStarted = False
 gameEnded = False
 notes = []
@@ -85,19 +82,23 @@ timedMessages = []
 msg_index = 0
 audioTime = 0
 t = 0
-last_midi = None
+last_played_note = None
+score = 0
+lastNoteScored = False
+endTime = 0
+
 
 @win.event
 def on_key_press(symbol, modifiers):
     global gameStarted
     global controlLabel
-    
+
     if symbol == pyglet.window.key.ESCAPE:
         soundInput.stop()
         player.stop()
         win.close()
         pyglet.app.exit()
-    
+
     if symbol == pyglet.window.key.SPACE and not gameStarted:
         gameStarted = True
         soundInput.start()
@@ -112,7 +113,8 @@ controlLabel = objectCreator.createControlLabel(foreground)
 
 
 def update(dt):
-    global msg_index, timedMessages, audioTime, gameStarted, notes, t, gameEnded, last_midi, controlLabel
+    global msg_index, timedMessages, audioTime, gameStarted, notes, t
+    global gameEnded, last_played_note, controlLabel, lastNoteScored, score, endTime
     t += dt
 
     if not gameStarted:
@@ -126,7 +128,10 @@ def update(dt):
             _, msg = timedMessages[msg_index]
             if msg.type in ("note_on", "note_off"):
                 player.playMessage(msg)
-            msg_index += 1  # ----- end ChatGpt generated code
+                if msg.type != 'note_off':
+                    last_played_note = msg.note
+                    lastNoteScored = False
+            msg_index += 1  # ----- end ChatGpt code
 
         for note in notes:
             note.rectangle.x = (win.width // 2 + 50) + (
@@ -143,9 +148,33 @@ def update(dt):
         # print("amp:", soundInput.amplitude)
         # print("dbfs:", soundInput.dbfs)
 
-        if soundInput.dbfs < - 45:
+        if soundInput.dbfs < -45:
             midi_note = None
+        
+        
+        if midi_note is not None and last_played_note is not None and not lastNoteScored:
+            octave_higher = midi_note + 12
+            octave_lower = midi_note - 12
 
+            if (
+                midi_note == last_played_note
+                or octave_higher == last_played_note
+                or octave_lower == last_played_note
+            ):  #
+                score += 25
+                lastNoteScored = True
+            elif (
+                abs(last_played_note - midi_note) <= 2
+                or abs(last_played_note - octave_higher) <= 2
+                or abs(last_played_note - octave_lower) <= 2
+            ):
+                score += 10
+                lastNoteScored = True
+            else:
+                pass
+                score += 1  # so not 0 score for signing wrong
+                lastNoteScored = True
+                
         if midi_note is not None:
 
             note = objectCreator.spawn_live_note(
@@ -153,18 +182,19 @@ def update(dt):
             )
             sung_note_rects.append(note)
 
-            last_midi = midi_note
-
         for sung_note_rect in sung_note_rects:
             sung_note_rect.x -= dt * 300
 
         if msg_index >= len(timedMessages):
+            endTime += dt
+            if endTime < 1.5:
+                return
             gameEnded = True
-            time.sleep(1)
-            controlLabel.text = 'The song is over\nPress ESC to exit the game'
-            controlLabel.x = win.width//4 * 3
-            
-            
+            controlLabel.text = "Song Over\n Your score is: {}\nPress ESC to exit the game".format(
+                score
+            )
+            controlLabel.x = win.width // 4 * 3
+
 
 pyglet.clock.schedule_interval(update, 0.01)  # 100 per sec
 pyglet.app.run()
